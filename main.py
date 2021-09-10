@@ -1,10 +1,12 @@
 import  tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, image_names
 import pathlib
 import sys
+from datos.imagen import imagen
+
 
 Contenido = ""
-
+listaImagen = []
 def leerArchivo(ruta):
     global Contenido
     print('------- Buscando archivo de entrada -------\n')
@@ -23,7 +25,7 @@ def cargarArchivo():
     filename = filedialog.askopenfilename()
     path = pathlib.Path(filename)
     extension = path.suffix
-    if extension == ".txt" or extension == ".LFP":
+    if extension == ".pxla" or extension == ".PXLA":
         #continuamos con la ejecucion del programa
         leerArchivo(filename)
     else:
@@ -35,13 +37,15 @@ def op1():
     except:
         print("Ocurrio un error, el cual fue ", sys.exc_info()[0])
 
-def separarCodigo(contenido):
+def separarArroba(contenido):
     global log
     imagenes = []
     actual = ""
     estado = 0
+    contador = 0
     longitud = len(contenido)
     for i in contenido:
+        contador += 1
         if estado == 0:
             if i == "\"":
                 estado =1
@@ -92,10 +96,7 @@ def separarCodigo(contenido):
                 actual += "@@"+i
                 continue
         if estado ==6:
-            print("llego aca")
-            print(i)
             if i ==" " or i == "\n" or i == "\t":
-                print("se agrego")
                 imagenes.append(actual)
                 estado = 0
                 actual = i
@@ -103,12 +104,19 @@ def separarCodigo(contenido):
             else:
                 estado = 0
                 actual += "@@@@"+i
-        imagenes.append(actual)
+        
+    imagenes.append(actual)
     return imagenes
 
+def separarToken(dato):
+    pass
+
+def asignarDatos():
+    global listaImagen,Contenido
+    separado = separarArroba(Contenido)
+    for i in separado:
+        nuevo = imagen(i)
+        listaImagen.append(nuevo)
+
 op1()
-separado = separarCodigo(Contenido)
-cadena = ""
-for i in separado:
-    cadena+= i
-print(cadena)
+asignarDatos()
