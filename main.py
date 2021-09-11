@@ -4,9 +4,50 @@ import pathlib
 import sys
 from datos.imagen import imagen
 
-
 Contenido = ""
 listaImagen = []
+
+def automataFiltros(valor):
+    estado = 0
+    actual = ""
+    contador = 0
+    for i in valor:
+        contador += 1
+        if estado == 0:
+            if i != ",":
+                continue
+            else:
+                if contador == len(valor):
+                    return False
+                estado = 1
+                continue
+        if estado == 1:
+            if i == " " or i=="\n" or i=="\t" or i =="":
+                return False 
+            else:
+                estado = 0
+                continue
+    filtros = splitear(valor,",")
+    for i in filtros:
+        if i == "MIRRORX" or i == "MIRRORY" or i == "DOUBLEMIRROR":
+            pass
+        else:
+            return False
+    return True
+
+def splitear(contenido,caracter):
+    listado = []
+    actual= ""
+    for i in contenido:
+        if i != caracter:
+            actual += i
+        else:
+            listado.append(actual.strip())
+            actual = ""
+    if actual != "":
+        listado.append(actual.strip())
+    return listado
+
 def leerArchivo(ruta):
     global Contenido
     print('------- Buscando archivo de entrada -------\n')
@@ -108,15 +149,84 @@ def separarArroba(contenido):
     imagenes.append(actual)
     return imagenes
 
-def separarToken(dato):
-    pass
+def automataCadena(valor):
+    estado = 0
+    actual = ""
+    valor = valor.strip()
+    valor += "#"
+    longitud = len(valor)
+    contador = 0
+    for i in valor:
+        contador += 1
+        if estado == 0 :
+            if i == "\"":
+                estado = 1
+                continue
+            else:
+                return False
+        if estado == 1:
+            if i != "\"":
+                actual += i
+                continue
+            else:
+                estado = 2
+                continue
+        if estado == 2:
+            if contador == longitud:
+                if i == "#":
+                    return True
+    return False
 
+def separarToken(imagen):
+    listado = splitear(imagen.datos,";")
+    dato = ""
+    dato2 = ""
+    estado = 0
+    for i in listado:
+        subListado  = splitear(i,"=")
+        if len(subListado) == 2:
+            token = subListado[0].strip()
+            valor = subListado[1].strip()
+            if token == "TITULO":
+                if automataCadena(valor):
+                    imagen.titulo = valor.strip()
+            elif token == "ANCHO":
+                valor = valor.strip()
+                if valor.isdigit():
+                    imagen.ancho = int(valor)
+            elif token == "ALTO":
+                valor = valor.strip()
+                if valor.isdigit():
+                    imagen.alto = int(valor)
+            elif token == "FILAS":
+                valor = valor.strip()
+                if valor.isdigit():
+                    imagen.filas = int(valor)
+            elif token == "COLUMNAS":
+                valor = valor.strip()
+                if valor.isdigit():
+                    imagen.columnas = int(valor)
+            elif token == "CELDAS":
+                imagen.celdas = valor
+            elif token == "FILTROS":
+                if automataFiltros(valor):
+                    imagen.filtros = valor
+            
 def asignarDatos():
     global listaImagen,Contenido
     separado = separarArroba(Contenido)
     for i in separado:
         nuevo = imagen(i)
         listaImagen.append(nuevo)
+    for i in listaImagen:
+        separarToken(i)
+    for i in listaImagen:
+        i.mostrarDatos()
+
+
 
 op1()
 asignarDatos()
+# for i in listaImagen:
+#     print(i.datos)
+#     print("--------------------------------")
