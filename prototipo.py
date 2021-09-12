@@ -91,10 +91,16 @@ def automataCeldas(celdas):
             if i == "{":
                 estado = 1
                 continue
+            else:
+                return False
         if estado == 1:
             if i == "[":
                 estado =2
                 continue
+            if i =="\n" or i == "\t" or i == " ":
+                    continue
+            else:
+                return False
         #celda del eje x
         if estado == 2:
             if i.isdigit():
@@ -143,25 +149,25 @@ def automataCeldas(celdas):
                 actual += i
                 continue
             else:
-                if re.search("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",a):
+                if re.search("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",actual):
                     estado = 8
                     actual = ""
                     continue
                 else:
                     return False
         if estado == 8 :
-            #aca vamos terminando los corchetes de la primer celda 
-            pass
-            
-           
-
-
-
-
-
-a = "   12   "
-print(a.isdigit())
-a = "1232-"
-print(a.isdigit())
-a = "   0   "
-print(a.isdigit())
+            if contador == len(celdas):
+                if i == "}":
+                    print("fue aceptada")
+                    return True
+                else:
+                    return False
+            if i != ",":
+                if i =="\n" or i == "\t" or i == " ":
+                    continue
+                else:
+                    return False
+            if i == ",":
+                estado = 1
+                continue
+    return False

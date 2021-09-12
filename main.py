@@ -3,6 +3,10 @@ from tkinter import filedialog, image_names
 import pathlib
 import sys
 from datos.imagen import imagen
+import re
+import sys
+
+
 
 Contenido = ""
 listaImagen = []
@@ -207,11 +211,103 @@ def separarToken(imagen):
                 if valor.isdigit():
                     imagen.columnas = int(valor)
             elif token == "CELDAS":
-                imagen.celdas = valor
+                if automataCeldas(valor):
+                    imagen.celdas = valor
             elif token == "FILTROS":
                 if automataFiltros(valor):
                     imagen.filtros = valor
-            
+
+def automataCeldas(celdas):
+    estado = 0
+    actual = ""
+    celdas = celdas.strip()
+    contador = 0
+    for i in celdas:
+        contador += 1
+        if estado == 0:
+            if i == "{":
+                estado = 1
+                continue
+            else:
+                return False
+        if estado == 1:
+            if i == "[":
+                estado =2
+                continue
+            if i =="\n" or i == "\t" or i == " ":
+                    continue
+            else:
+                return False
+        #celda del eje x
+        if estado == 2:
+            if i.isdigit():
+                estado = 3
+                continue
+            else:
+                return False
+        if estado == 3:
+            if i !=",":
+                if i.isdigit():
+                    continue
+                else:
+                    return False
+            else:
+                estado = 4
+                continue
+        #celda del eje y
+        if estado == 4:
+            if i.isdigit():
+                estado = 5
+                continue
+            else:
+                return False
+        if estado == 5:
+            if i !=",":
+                if i.isdigit():
+                    continue
+                else:
+                    return False
+            else:
+                estado = 6
+                continue
+        if estado == 6:
+            if i != ",":
+                actual += i
+                continue
+            else:
+                if actual == "TRUE" or actual =="FALSE":
+                    actual = ""
+                    estado = 7
+                    continue
+                else:
+                    return False
+        if estado ==7:
+            if i != "]":
+                actual += i
+                continue
+            else:
+                if re.search("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",actual):
+                    estado = 8
+                    actual = ""
+                    continue
+                else:
+                    return False
+        if estado == 8 :
+            if contador == len(celdas):
+                if i == "}":
+                    return True
+                else:
+                    return False
+            if i != ",":
+                if i =="\n" or i == "\t" or i == " ":
+                    continue
+                else:
+                    return False
+            if i == ",":
+                estado = 1
+                continue
+    return False
+
 def asignarDatos():
     global listaImagen,Contenido
     separado = separarArroba(Contenido)
@@ -221,8 +317,9 @@ def asignarDatos():
     for i in listaImagen:
         separarToken(i)
     for i in listaImagen:
+        i.autoLlenado()
         i.mostrarDatos()
-
+        i.mostrarListado()
 
 
 op1()

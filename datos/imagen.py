@@ -1,6 +1,8 @@
+from datos.celda import celda
+
 class imagen():
     def __init__(self,datos):
-        self.datos = datos
+        self.datos = datos #texto
         self.titulo = "titulo no encontrado"
         self.ancho = None
         self.alto = None
@@ -8,6 +10,7 @@ class imagen():
         self.columnas = None
         self.celdas = None
         self.filtros = None
+        self.listadoCeldas = None
     
     def verificar(self):
         if self.datos is not None:
@@ -27,4 +30,63 @@ class imagen():
         print("FILAS",self.filas)
         print("COLUMNAS",self.columnas)
         print("FILTROS",self.filtros)
-        print("CELDAS",self.celdas)
+
+    def quitarSaltos(self,contenido):
+        actual = ""
+        for i in contenido:
+            if i !="\n" and i !="\t" and i !=" ":
+                actual += i
+        return actual
+
+    def automataCorchete(self,celdas):
+        actual = ""
+        estado = 0
+        lista = []
+        for i in celdas:
+            if estado == 0:
+                if i =="]":
+                    estado =1
+                    actual += "]"
+                    continue
+                else:
+                    actual += i
+                    continue
+            if estado == 1:
+                if i ==",":
+                    lista.append(actual)
+                    actual = ""
+                    estado = 0
+                    continue
+        lista.append(actual)
+        return lista
+
+    def autoLlenado(self):
+        #en dato voy a mandar lo de las llaves{}
+        actual = self.celdas
+        actual = actual.strip()
+        actual = actual.replace("{", "")
+        actual = actual.replace("}", "")
+        actual = actual.strip()
+        actual = self.quitarSaltos(actual)
+        #hasta aca ya tenemos todo por corchetes y comas.
+        lista = self.automataCorchete(actual)
+        lCeldas = []
+        for i in lista:
+            try:
+                nuevo = celda(i)
+                nuevo.autoLlenado()
+                lCeldas.append(nuevo)
+            except:
+                pass
+        self.listadoCeldas = lCeldas
+
+    def mostrarListado(self):
+        print("============================ sus celdas son =========================")
+        contador = 1
+        for i in self.listadoCeldas:
+            print(f"------Celda #{contador}------")
+            print(">>>>fila",i.fila)
+            print(">>>>columna",i.columna)
+            print(">>>>pintar",i.pintar)
+            print(">>>>color",i.color)
+            contador += 1
