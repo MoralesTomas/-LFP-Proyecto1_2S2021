@@ -171,3 +171,12 @@ def automataCeldas(celdas):
                 estado = 1
                 continue
     return False
+
+
+x = 5
+contenido = ""
+for i in range(x):
+    for a in range(x):
+        print("fila",i,"columna")
+        contenido += f"{x}"
+        print(contenido)

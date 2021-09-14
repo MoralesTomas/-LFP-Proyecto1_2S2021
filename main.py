@@ -3,6 +3,7 @@ from tkinter import filedialog, image_names
 import pathlib
 import sys
 from datos.imagen import imagen
+from archivo import archivo
 import re
 import sys
 
@@ -183,9 +184,6 @@ def automataCadena(valor):
 
 def separarToken(imagen):
     listado = splitear(imagen.datos,";")
-    dato = ""
-    dato2 = ""
-    estado = 0
     for i in listado:
         subListado  = splitear(i,"=")
         if len(subListado) == 2:
@@ -193,6 +191,7 @@ def separarToken(imagen):
             valor = subListado[1].strip()
             if token == "TITULO":
                 if automataCadena(valor):
+                    valor = valor.replace("\"","")
                     imagen.titulo = valor.strip()
             elif token == "ANCHO":
                 valor = valor.strip()
@@ -318,12 +317,11 @@ def asignarDatos():
         separarToken(i)
     for i in listaImagen:
         i.autoLlenado()
-        i.mostrarDatos()
-        i.mostrarListado()
+        # i.mostrarDatos()
+        # i.mostrarListado()
 
 
 op1()
 asignarDatos()
-# for i in listaImagen:
-#     print(i.datos)
-#     print("--------------------------------")
+reporte = archivo(listaImagen[0])
+reporte.generar()

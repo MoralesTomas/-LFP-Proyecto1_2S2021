@@ -90,3 +90,23 @@ class imagen():
             print(">>>>pintar",i.pintar)
             print(">>>>color",i.color)
             contador += 1
+
+    def buscarCelda(self,fila,columna):
+        listado = self.listadoCeldas
+        for i in listado:
+            try:
+                if i.fila == fila and i.columna == columna:
+                    return i
+            except:
+                pass
+        if fila <= self.filas and columna <= self.columnas:
+            #[0,1,FALSE,#000000]
+            nuevo = celda(f"[{columna},{fila},FALSE,#FFFFFF]")
+            nuevo.autoLlenado()
+            self.listadoCeldas.append(nuevo)
+            return nuevo
+        else:
+            #en caso de que la fila y columna buscada no existan y exceda los limites de filas y columnas solicitadas
+            return None
+    
+    

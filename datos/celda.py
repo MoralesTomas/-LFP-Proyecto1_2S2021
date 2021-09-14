@@ -25,9 +25,15 @@ class celda():
         a = a.replace("]", "")
         lista = self.splitear(a,",")
         try:
+            #comentado donde el primero es la columna y el segundo es la fila
             self.columna = int(lista[0])
             self.fila = int(lista[1])
             self.pintar = lista[2]
+            if self.pintar.strip() == "FALSE":
+                self.pintar = False
+            else:
+                self.pintar = True
             self.color = lista[3]
+            #print("se genero una nueva celda",self.fila,self.columna,self.color)
         except:
             pass
