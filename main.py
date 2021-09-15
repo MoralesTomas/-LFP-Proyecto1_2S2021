@@ -318,9 +318,18 @@ def asignarDatos():
         i.autoLlenado()
         # i.mostrarDatos()
         # i.mostrarListado()
+    contador = 1
+    for i in listaImagen:
+        try:
+            repTmp = archivo(i)
+            repTmp.generar()
+        except:
+            print(f"No se pudo generar el reporte de la imagen #{contador}")
+        contador += 1
 
-
+#solo para la carga y la lectura.
 op1()
+
+#para analizar los datos de la lectura // crea el html y las imagenes en png
 asignarDatos()
-reporte = archivo(listaImagen[0])
-reporte.generar()
+
