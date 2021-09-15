@@ -8,7 +8,7 @@ class imagen():
         self.alto = None
         self.filas = None
         self.columnas = None
-        self.celdas = None
+        self.celdas = None #solo es texto . completo {[[][][]]}
         self.filtros = None
         self.listadoCeldas = None
     

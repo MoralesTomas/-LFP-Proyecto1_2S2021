@@ -8,7 +8,6 @@ import re
 import sys
 
 
-
 Contenido = ""
 listaImagen = []
 
@@ -211,7 +210,7 @@ def separarToken(imagen):
                     imagen.columnas = int(valor)
             elif token == "CELDAS":
                 if automataCeldas(valor):
-                    imagen.celdas = valor
+                    imagen.celdas = valor #solo texto
             elif token == "FILTROS":
                 if automataFiltros(valor):
                     imagen.filtros = valor
@@ -253,7 +252,7 @@ def automataCeldas(celdas):
             else:
                 estado = 4
                 continue
-        #celda del eje y
+        #celda del eje y filas
         if estado == 4:
             if i.isdigit():
                 estado = 5
@@ -269,7 +268,7 @@ def automataCeldas(celdas):
             else:
                 estado = 6
                 continue
-        if estado == 6:
+        if estado == 6: 
             if i != ",":
                 actual += i
                 continue
