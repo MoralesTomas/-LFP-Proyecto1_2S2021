@@ -7,6 +7,11 @@ from archivo import archivo
 import re
 import sys
 
+#imports para la interfaz
+import sys
+from PyQt5 import uic
+from PyQt5.QtWidgets import QMainWindow, QApplication
+
 
 Contenido = ""
 listaImagen = []
