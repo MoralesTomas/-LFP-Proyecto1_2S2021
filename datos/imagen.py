@@ -11,6 +11,7 @@ class imagen():
         self.celdas = None #solo es texto . completo {[[][][]]}
         self.filtros = None
         self.listadoCeldas = None
+        self.lexico = None
     
     def verificar(self):
         if self.datos is not None:
@@ -19,7 +20,8 @@ class imagen():
                     if self.filas is not None:
                         if self.columnas is not None:
                             if self.celdas is not None:
-                                return True
+                                if self.lexico is None:
+                                    return True
         return False
 
     def mostrarDatos(self):

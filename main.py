@@ -212,8 +212,12 @@ def separarToken(imagen):
                 if automataCeldas(valor):
                     imagen.celdas = valor #solo texto
             elif token == "FILTROS":
+                # print("encontro los filtros")
+                # print(token,valor)
                 if automataFiltros(valor):
                     imagen.filtros = valor
+            else:
+                imagen.lexico = False
 
 def automataCeldas(celdas):
     estado = 0
@@ -319,17 +323,18 @@ def asignarDatos():
         # i.mostrarDatos()
         # i.mostrarListado()
     contador = 1
-    for i in listaImagen:
-        try:
-            repTmp = archivo(i)
-            repTmp.generar()
-        except:
-            print(f"No se pudo generar el reporte de la imagen #{contador}")
-        contador += 1
+    # for i in listaImagen:
+    #     try:
+    #         repTmp = archivo(i)
+    #         repTmp.generar()
+    #     except:
+    #         print(f"No se pudo generar el reporte de la imagen #{contador}")
+    #     contador += 1
 
 #solo para la carga y la lectura.
 op1()
 
 #para analizar los datos de la lectura // crea el html y las imagenes en png
 asignarDatos()
-
+r = archivo(listaImagen[0])
+r.generar()
