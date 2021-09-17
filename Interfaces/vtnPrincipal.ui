@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>475</height>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -136,16 +136,6 @@
      <string>Salir</string>
     </property>
    </widget>
-   <widget class="QGraphicsView" name="panelImagen">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>50</y>
-      <width>471</width>
-      <height>401</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QComboBox" name="btnLista">
     <property name="geometry">
      <rect>
@@ -155,8 +145,13 @@
       <height>31</height>
      </rect>
     </property>
+    <item>
+     <property name="text">
+      <string>Seleccione la imagen</string>
+     </property>
+    </item>
    </widget>
-   <widget class="QPushButton" name="btn_BusquedaLista">
+   <widget class="QPushButton" name="btn_visualizar">
     <property name="geometry">
      <rect>
       <x>560</x>
@@ -169,7 +164,7 @@
      <string notr="true">background-color: rgb(49, 255, 73);</string>
     </property>
     <property name="text">
-     <string>Buscar</string>
+     <string>Visualizar</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btnVistaOriginal">
@@ -222,6 +217,40 @@
     </property>
     <property name="text">
      <string>DOUBLEMIRROR</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="areaImagen">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>50</y>
+      <width>400</width>
+      <height>400</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="etiquetaDim">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>460</y>
+      <width>611</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

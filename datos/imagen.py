@@ -21,7 +21,8 @@ class imagen():
                         if self.columnas is not None:
                             if self.celdas is not None:
                                 if self.lexico is None:
-                                    return True
+                                    if self.titulo is  not "titulo no encontrado":
+                                        return True
         return False
 
     def mostrarDatos(self):

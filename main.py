@@ -1,5 +1,6 @@
 import  tkinter as tk
 from tkinter import filedialog, image_names
+from pathlib import Path
 import pathlib
 import sys
 from datos.imagen import imagen
@@ -7,14 +8,18 @@ from archivo import archivo
 import re
 import sys
 
+
 #imports para la interfaz
 import sys
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QApplication,QMessageBox
 
 
 Contenido = ""
 listaImagen = []
+boolCarga = False
 
 def automataFiltros(valor):
     estado = 0
@@ -58,16 +63,19 @@ def splitear(contenido,caracter):
     return listado
 
 def leerArchivo(ruta):
-    global Contenido
+    global Contenido, boolCarga
+    Contenido = ""
     print('------- Buscando archivo de entrada -------\n')
     try:
         with open(ruta, encoding='utf-8') as file:
             contenido = file.read()
             print("\n----------- Carga completada ----------\n")
             Contenido = contenido
+            boolCarga = True
     except:
         print('No se pudo abrir el fichero de la ruta: ' + ruta)
         print("El eror fue : ",sys.exc_info()[0],"\n")
+        return False
 
 def cargarArchivo():
     root = tk.Tk()
@@ -80,12 +88,18 @@ def cargarArchivo():
         leerArchivo(filename)
     else:
         print("\nEl archivo no es de la extension requerida.")
+        return False
 
 def op1():
+    global Contenido, boolCarga
     try:
+        Contenido = ""
+        boolCarga = False
         cargarArchivo()
+        return True
     except:
         print("Ocurrio un error, el cual fue ", sys.exc_info()[0])
+        return False
 
 def separarArroba(contenido):
     global log
@@ -317,29 +331,120 @@ def automataCeldas(celdas):
 
 def asignarDatos():
     global listaImagen,Contenido
-    separado = separarArroba(Contenido)
-    for i in separado:
-        nuevo = imagen(i)
-        listaImagen.append(nuevo)
-    for i in listaImagen:
-        separarToken(i)
-    for i in listaImagen:
-        i.autoLlenado()
-        # i.mostrarDatos()
-        # i.mostrarListado()
-    contador = 1
-    # for i in listaImagen:
-    #     try:
-    #         repTmp = archivo(i)
-    #         repTmp.generar()
-    #     except:
-    #         print(f"No se pudo generar el reporte de la imagen #{contador}")
-    #     contador += 1
+    listaImagen = []
+    try:
+        separado = separarArroba(Contenido)
+        for i in separado:
+            nuevo = imagen(i)
+            listaImagen.append(nuevo)
+        for i in listaImagen:
+            separarToken(i)
+        for i in listaImagen:
+            i.autoLlenado()
+            # i.mostrarDatos()
+            # i.mostrarListado()
+        contador = 1
+        for i in listaImagen:
+            try:
+                repTmp = archivo(i)
+                repTmp.generar()
+            except:
+                print(f"No se pudo generar el reporte de los datos en la posicion #{contador}")
+            contador += 1
+    except:
+        return False
 
-#solo para la carga y la lectura.
-op1()
+# #solo para la carga y la lectura.
+# op1()
 
-#para analizar los datos de la lectura // crea el html y las imagenes en png
-asignarDatos()
-r = archivo(listaImagen[0])
-r.generar()
+# #para analizar los datos de la lectura // crea el html y las imagenes en png
+# asignarDatos()
+# r = archivo(listaImagen[0])
+# r.generar()
+
+
+class ejemplo_GUI(QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("Interfaces//vtnPrincipal.ui", self)
+        
+        self.btn_Cargar.clicked.connect(self.cargar)
+        self.btn_Analizar.clicked.connect(self.analizar)
+        self.btn_Salir.clicked.connect(self.terminarPrograma)
+        self.btn_visualizar.clicked.connect(self.primero)
+        self.btnVistaOriginal.clicked.connect(self.primero)
+        self.btnVistaX.clicked.connect(self.segundo)
+        self.btnVistaY.clicked.connect(self.tercero)
+        self.btnVistaDouble.clicked.connect(self.cuarto)
+        
+    def primero(self):
+        self.buscar("")
+
+    def segundo(self):
+        self.buscar("_MIRRORX")
+    
+    def tercero(self):
+        self.buscar("_MIRRORY")
+    
+    def cuarto(self):
+        self.buscar("_DOUBLEMIRROR")
+
+    def cargar(self):
+        global boolCarga
+        if op1() is not None:
+            
+            if boolCarga:
+                QMessageBox.information(self, "Exito","Se cargo el archivo de entrada.\n")
+            else:
+                QMessageBox.warning(self, "Error","Error, no se pudo cargar el archivo.\nVerifique que el archivo cumpla con la extension requerida.")
+        
+        else:
+            QMessageBox.warning(self, "Error","Error, no se pudo cargar el archivo.\nVerifique que el archivo cumpla con la extension requerida.")
+    
+    def analizar(self):
+        if asignarDatos() is not False:
+            for i in listaImagen:
+                if i.verificar:
+                    self.btnLista.addItem(str(i.titulo))
+            QMessageBox.information(self, "Exito","Se analizaron los datos del archivo de entrada.\n")
+            
+        else:
+            QMessageBox.warning(self, "Error","Error, para analizar datos se necesita que cargue un archivo inicial.")
+
+    def buscar(self,agregar):
+        nombre = self.btnLista.currentText()
+        for i in listaImagen:
+            if i.verificar:
+                if i.titulo == nombre:
+                    nombre = nombre + agregar
+                    ruta = "imagenes//"+nombre+".png"
+                    fileObj = Path(ruta)
+                    try:
+                        if fileObj.is_file():
+                            pixmapImagen = QPixmap(ruta).scaled(400,400,Qt.KeepAspectRatio,Qt.SmoothTransformation)
+                            self.areaImagen.setPixmap(pixmapImagen)
+                            self.etiquetaDim.setText("Las dimensiones de la imagen son: "+str(i.ancho)+" x "+str(i.alto))
+                            return True
+                        else:
+                            print("No se encontro la imagen")
+                            nombre = "Aerror"
+                            ruta = "imagenes//"+nombre+".jpg"
+                            pixmapImagen = QPixmap(ruta).scaled(400,400,Qt.KeepAspectRatio,Qt.SmoothTransformation)
+                            self.areaImagen.setPixmap(pixmapImagen)
+                            self.etiquetaDim.setText("Error, no encontramos la imagen. revise que el archivo contenga el filtro")
+                            return True
+                    except:
+                        return False
+                        
+        QMessageBox.warning(self, "Error","Error, no se pudo mostrar la imagen solicitada.")
+
+    def terminarPrograma(self):
+        sys.exit()
+    
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    GUI = ejemplo_GUI()
+    GUI.show()
+    sys.exit(app.exec_())
