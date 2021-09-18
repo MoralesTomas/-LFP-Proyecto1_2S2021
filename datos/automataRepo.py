@@ -41,7 +41,6 @@ class AnalizadorLexico:
         i = 0
         while i< len(codigo_fuente):
             c = codigo_fuente[i]
-            
             if estado == 0:
                 if c == '=':
                     buffer += c
@@ -86,13 +85,15 @@ class AnalizadorLexico:
                     buffer += c
                     columna += 1
                     estado = 2
-                elif re.search('[a-z]', c):
+                elif re.search('[A-Z]', c):
                     buffer += c
                     columna += 1
                     estado = 3
                 elif c == '\n':
                     linea += 1
                     columna = 1
+                elif c == " ":
+                    columna += 1
                 elif c == '\t':
                     columna += 1
                 elif c == '\r':
@@ -139,7 +140,7 @@ class AnalizadorLexico:
                     i -= 1
                     estado = 0
             elif estado == 3:
-                if re.search('[a-z]', c):
+                if re.search('[A-Z]', c):
                     buffer += c
                     columna += 1
                 else:
@@ -159,6 +160,10 @@ class AnalizadorLexico:
                         self.listaTokens.append(Token(buffer, 'FILTROS', linea, columna))
                     elif buffer == 'TRUE' or buffer == "FALSE":
                         self.listaTokens.append(Token(buffer, 'BOOLEANO', linea, columna))
+                    elif buffer == 'MIRRORX' or buffer == "MIRRORY" or buffer == "DOUBLEMIRROR":
+                        self.listaTokens.append(Token(buffer, 'FILTRO', linea, columna))
+                    else:
+                        self.listaErrores.append(Error('Cadena ' + buffer + ' no reconocida en el lenguaje.', 'Léxico', linea, columna))
                     buffer = ''
                     i -= 1
                     estado = 0
@@ -169,8 +174,11 @@ class AnalizadorLexico:
                 else:
                     if re.search("^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$",buffer):
                         self.listaTokens.append(Token(buffer, 'COLOR', linea, columna))
+                        buffer = ''
+                        i -= 1
+                        estado = 0
                     else:
-                        self.listaErrores.append(Error('Cadena' + buffer + ' no reconocido en el lenguaje.', 'Léxico', linea, columna))
+                        self.listaErrores.append(Error('Cadena' + buffer + ' no reconocida en el lenguaje.', 'Léxico', linea, columna))
                         buffer = ''
                         i -= 1
                         estado = 0
@@ -191,21 +199,22 @@ class AnalizadorLexico:
                     columna += 1
                     estado = 7 # en seis ya llevaria 3 @
                 else:
-                    self.listaErrores.append(Error('Cadena ' + buffer + ' no reconocido en el lenguaje.', 'Léxico', linea, columna))
+                    self.listaErrores.append(Error('Cadena ' + buffer + ' no reconocida en el lenguaje.', 'Léxico', linea, columna))
                     buffer = ''
                     i -= 1
                     estado = 0
             elif estado == 7:
                 if c == "@":
                     buffer += c
-                    columna += 1
                     siguiente = ""
                     if (i+1) <= len(codigo_fuente):
                         siguiente = codigo_fuente[i+1]
                     if buffer == "@@@@" and siguiente == " " or siguiente == "\n" or siguiente == "\t" or siguiente == "\r" or siguiente == "" or re.search('T|A|F|C|#', siguiente):
                         self.listaTokens.append(Token(buffer, 'SEPARADOR', linea, columna))
                         buffer = ""
-                        columna += 1
+                        estado = 0
+                    
+                    columna += 1
                 else:
                     self.listaErrores.append(Error('Cadena ' + buffer + ' no reconocido en el lenguaje.', 'Léxico', linea, columna))
                     buffer = ''
@@ -213,7 +222,7 @@ class AnalizadorLexico:
                     estado = 0
             
             i += 1
-
+    
     def impTokens(self):
         for t in self.listaTokens:
             t.impToken()
@@ -224,7 +233,10 @@ class AnalizadorLexico:
         else:
             for e in self.listaErrores:
                 e.impError()
-    
+    def obtenerListaToken(self):
+        return self.listaTokens
+    def obtenerListaErrores(self):
+        return self.listaErrores
 
 def leerArchivo(ruta):
     archivo = open(ruta, 'r')

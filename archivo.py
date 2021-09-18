@@ -33,7 +33,7 @@ class archivo():
                             contenido += f" \n<td WIDTH=\"{anchoPx}\"  HEIGHT=\"{altoPx}\"></td>" 
                 contenido += "\n</tr>"
             contenido +="\n</table>"
-            contenido += "\n<body>"
+            contenido += "\n</body>"
             contenido += "\n</html>"
 
             self.imagen.alto = self.imagen.alto + 1
@@ -76,7 +76,7 @@ class archivo():
                         x = x -1
                     contenido += "\n</tr>"
                 contenido +="\n</table>"
-                contenido += "\n<body>"
+                contenido += "\n</body>"
                 contenido += "\n</html>"
                 self.imagen.alto = self.imagen.alto + 1
 
@@ -116,7 +116,7 @@ class archivo():
                     x = x -1
                     contenido += "\n</tr>"
                 contenido +="\n</table>"
-                contenido += "\n<body>"
+                contenido += "\n</body>"
                 contenido += "\n</html>"
                 self.imagen.alto = self.imagen.alto + 1
 
@@ -158,7 +158,7 @@ class archivo():
                     x = x -1
                     contenido += "\n</tr>"
                 contenido +="\n</table>"
-                contenido += "\n<body>"
+                contenido += "\n</body>"
                 contenido += "\n</html>"
                 self.imagen.alto = self.imagen.alto + 1
 
@@ -189,3 +189,60 @@ class archivo():
         hti.output_path = rCarpeta
         # hti.screenshot(html_file=rHtml, css_file='Reportes\\estilo.css',save_as=nombre+".png",size=(self.imagen.ancho,self.imagen.alto))
         hti.screenshot(html_file=rHtml,save_as=nombre+".png",size=(self.imagen.ancho,self.imagen.alto))
+
+    def escribirReporte(self,titulo,contenido):
+        ruta = "Reportes//"+titulo+".html"
+        try:
+            with open(ruta, 'w', encoding='utf-8') as file:
+                file.write(contenido)
+                print('\nSe genero el archivo correctamente_Reportes\n')
+                ruta = os.path.abspath(ruta)
+
+        except:
+            print('\nNo se pudo generar el archivo_Reportes :c\n')
+
+    def generarReporte(self,titulo,listado,primerColumna):
+        
+        contenido = ""
+        contenido += "<HTML>"
+        contenido += f"\n<title align=\"center\"  > {titulo} </title>"
+        contenido += "\n<head>"
+        contenido += "<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU\" crossorigin=\"anonymous\">"
+            
+        contenido += "\n<body>"
+        contenido += "\n<table class=\"table table-success table-striped\" >"
+        contenido += "\n"
+        contenido += f'''
+        <thead>
+        <tr>
+        <th scope="col">#</th>
+        <th scope="col">{primerColumna}</th>
+        <th scope="col">Tipo</th>
+        <th scope="col">Linea</th>
+        <th scope="col">columna</th>
+        </tr>
+        </thead>
+        '''
+        numero = 1
+        for i in listado:
+                try:
+                    contenido += "<tr>"
+                    contenido += f"<td>{numero}</td>"
+                    numero += 1
+                    if primerColumna == "Lexema":
+                        contenido += f"\n<td >{i.lexema}</td>" 
+                    else:
+                        contenido += f"\n<td >{i.descripcion}</td>" 
+                    contenido += f"\n<td>{i.tipo}</td>"
+                    contenido += f"\n<td>{i.linea}</td>"
+                    contenido += f"\n<td>{i.columna}</td>"
+                    contenido += "\n</tr>"
+                except:
+                    pass
+        contenido +="\n</table>"
+        contenido += "\n</body>"
+        contenido += "\n</html>"
+        try:
+            self.escribirReporte(titulo,contenido)
+        except:
+            return False

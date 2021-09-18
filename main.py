@@ -4,10 +4,12 @@ from pathlib import Path
 import pathlib
 import sys
 from datos.imagen import imagen
+from datos.automataRepo import AnalizadorLexico
 from archivo import archivo
+import webbrowser
 import re
 import sys
-
+import os
 
 #imports para la interfaz
 import sys
@@ -20,6 +22,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication,QMessageBox
 Contenido = ""
 listaImagen = []
 boolCarga = False
+boolReportes = False
 
 def automataFiltros(valor):
     estado = 0
@@ -377,6 +380,7 @@ class ejemplo_GUI(QMainWindow):
         self.btnVistaX.clicked.connect(self.segundo)
         self.btnVistaY.clicked.connect(self.tercero)
         self.btnVistaDouble.clicked.connect(self.cuarto)
+        self.btn_Reportes.clicked.connect(self.mostrarReportes)
         
     def primero(self):
         self.buscar("")
@@ -403,10 +407,27 @@ class ejemplo_GUI(QMainWindow):
             QMessageBox.warning(self, "Error","Error, no se pudo cargar el archivo.\nVerifique que el archivo cumpla con la extension requerida.")
     
     def analizar(self):
+        global boolReportes
+        analizador = AnalizadorLexico()
+        analizador.analizar(Contenido)
+        analizador.impTokens()
+        analizador.impErrores()
+        try:
+            listaToken = analizador.obtenerListaToken()
+            listaErrores = analizador.obtenerListaErrores()
+            boolReportes = True
+            repo = archivo(None)
+            repo.generarReporte("REPORTE_TOKENS",listaToken,"Lexema")
+            repo.generarReporte("REPORTE_ERRORES",listaErrores,"Descripcion")
+            
+        except:
+            pass
+
         if asignarDatos() is not False:
             for i in listaImagen:
                 if i.verificar:
                     self.btnLista.addItem(str(i.titulo))
+            
             QMessageBox.information(self, "Exito","Se analizaron los datos del archivo de entrada.\n")
             
         else:
@@ -442,6 +463,14 @@ class ejemplo_GUI(QMainWindow):
     def terminarPrograma(self):
         sys.exit()
     
+    def mostrarReportes(self):
+        # "Reportes//"+titulo+".html"
+        nombreArchivo = "Reportes//REPORTE_TOKENS.html"
+        nombreArchivo2 = "Reportes//REPORTE_ERRORES.html"
+        nombreArchivo =  os.path.abspath(nombreArchivo)
+        nombreArchivo2 =  os.path.abspath(nombreArchivo2)
+        webbrowser.open_new_tab(nombreArchivo)
+        webbrowser.open_new_tab(nombreArchivo2)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
