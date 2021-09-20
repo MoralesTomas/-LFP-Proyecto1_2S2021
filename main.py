@@ -450,7 +450,7 @@ class ejemplo_GUI(QMainWindow):
                         else:
                             print("No se encontro la imagen")
                             nombre = "Aerror"
-                            ruta = "imagenes//"+nombre+".jpg"
+                            ruta = "imagenesError//"+nombre+".jpg"
                             pixmapImagen = QPixmap(ruta).scaled(400,400,Qt.KeepAspectRatio,Qt.SmoothTransformation)
                             self.areaImagen.setPixmap(pixmapImagen)
                             self.etiquetaDim.setText("Error, no encontramos la imagen. revise que el archivo contenga el filtro")
